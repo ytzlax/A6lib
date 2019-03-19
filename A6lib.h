@@ -4,13 +4,13 @@
 #include <Arduino.h>
 #include "SoftwareSerial.h"
 
-#ifdef DEBUG
+//#ifdef DEBUG
 #define log(msg) Serial.print(msg)
 #define logln(msg) Serial.println(msg)
-#else
-#define log(msg)
-#define logln(msg)
-#endif
+//#else
+//#define log(msg)
+//#define logln(msg)
+//#endif
 
 #define countof(a) (sizeof(a) / sizeof(a[0]))
 
@@ -21,6 +21,11 @@
 
 #define A6_CMD_TIMEOUT 2000
 
+///////////////////////////////////////////httplib///////////////////////
+#define TIMEOUT_HTTP_RESPONSE 3000
+#define EXPECTED_RESPONSE_LENGTH  1000
+
+/////////////////////////////////////////////////////////////////////////
 
 enum call_direction {
     DIR_OUTGOING = 0,
@@ -101,11 +106,38 @@ public:
     String getRealTimeClock();
 
     SoftwareSerial *A6conn;
+
+///////////////////////////httplib//////////////////////////////////////////////////////
+    bool ConnectGPRS(String apn);
+
+    bool HTTPPostInitiate(String host, String path,int port);
+    void AddHeader(String);
+    void HTTPPostRequest(const char *);
+
+    String Get(String host, String path);
+    String getResponseData(String);
+    int getResponseLength();
+    int FreeModem(long timeout);
+
+    void CloseTCPConn();
+ ///////////////////////////////////////////////////////////////////////////////////////
+
 private:
     String read();
     byte A6command(const char *command, const char *resp1, const char *resp2, int timeout, int repetitions, String *response);
     byte A6waitFor(const char *resp1, const char *resp2, int timeout, String *response);
     long detectRate();
     char setRate(long baudRate);
+    
+    ///////////////////////////httplib//////////////////////////////////////////////////////
+
+    String _host;
+    int _port;
+    String _path;
+    String _apn;
+    // A6lib *_A6l;
+    int _ResponseLength;
+    
+    /////////////////////////////////////////////////////////////////////////////////////////
 };
 #endif
