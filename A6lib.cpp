@@ -251,6 +251,13 @@ String A6lib::getIP() {
 	return response.substring(respStart, response.indexOf("\""));
 }
 
+String A6lib::switchOff() {
+	String response = "";
+
+    // Issue the command and wait for the response.
+	A6command("AT+CPOF", "OK", "yy", A6_CMD_TIMEOUT, 1, &response);
+}
+
 
 // Send an SMS.
 byte A6lib::sendSMS(String number, String text) {
@@ -667,46 +674,47 @@ String A6lib::HTTPPostRequest(const char *postbody) {
         //do further things here like storing data in some variable.
     }
 
-    while (1) {
-    	if (A6conn->available()) {
-    		rcv = "";
-    		rcv = A6conn->readStringUntil('\r');
-    		int index = rcv.indexOf('+');
-    		if (index != -1) {
-    			int colon_index = rcv.indexOf(':');
-    			String cutfromrecvd = rcv.substring(index, colon_index);
-    			if (cutfromrecvd == rcv_str) {
-    				logln(F("\nrecieving data"));
-    			}
-    			int comma_index = rcv.indexOf(',');
-    			if (comma_index != -1) {
-    				bytes_in_body = rcv.substring(colon_index + 1, comma_index);
-    				_ResponseLength = bytes_in_body.toInt();
-    				int no_of_bytes = _ResponseLength;
-    				long now = millis();
-    				long ntime = 0;
-    				while (1) {
-    					long ntime = millis();
-    					if (ntime - now > 10000 || (bytes_read == no_of_bytes)) {
-    						break;
-    					}
-    					if (A6conn->available()) {
-    						body_rcvd_data += (char) A6conn->read();
-    						bytes_read += 1;
-    					}
-    				}
-    				break;
-    			} else {
-    				logln(F("Incorrect Data found"));
-    			}
-    		}
-    	}
+    // while (1) {
+    // 	if (A6conn->available()) {
+    // 		rcv = "";
+    // 		rcv = A6conn->readStringUntil('\r');
+    // 		int index = rcv.indexOf('+');
+    // 		if (index != -1) {
+    // 			int colon_index = rcv.indexOf(':');
+    // 			String cutfromrecvd = rcv.substring(index, colon_index);
+    // 			if (cutfromrecvd == rcv_str) {
+    // 				logln(F("\nrecieving data"));
+    // 			}
+    // 			int comma_index = rcv.indexOf(',');
+    // 			if (comma_index != -1) {
+    // 				bytes_in_body = rcv.substring(colon_index + 1, comma_index);
+    // 				_ResponseLength = bytes_in_body.toInt();
+    // 				int no_of_bytes = _ResponseLength;
+    // 				long now = millis();
+    // 				long ntime = 0;
+    // 				while (1) {
+    // 					long ntime = millis();
+    // 					if (ntime - now > 10000 || (bytes_read == no_of_bytes)) {
+    // 						break;
+    // 					}
+    // 					if (A6conn->available()) {
+    // 						body_rcvd_data += (char) A6conn->read();
+    // 						bytes_read += 1;
+    // 					}
+    // 				}
+    // 				break;
+    // 			} else {
+    // 				logln(F("Incorrect Data found"));
+    // 				body_rcvd_data="";
+    // 			}
+    // 		}
+    // 	}
 
 
-    }
+    // }
     //logln(body_rcvd_data);
     CloseTCPConn();
-    return body_rcvd_data;
+    return "";
 }
 
 
